@@ -133,8 +133,9 @@ if (navigator.getUserMedia) {
 
       let storageRef = firebase.storage().ref("tmp").child(time + ".webm")
       let uploadTask = storageRef.put(blob).then(function(snapshot) {
-        console.log("File uploaded!");
+        console.log("File uploaded:", snapshot.downloadURL, "("+snapshot.bytesTransferred, "bytes)");
       });
+      console.log(uploadTask)
 
       let data = {
         time: time
