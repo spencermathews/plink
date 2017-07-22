@@ -1,0 +1,25 @@
+body {
+  text-align: center;
+}
+
+#play {
+  width: 100px;
+  height: 100px;
+  margin: 50px;
+  
+  font-size: 30px;
+  background-color: black;
+  color: white;
+  
+  border: solid 1px #000;
+  border-radius: 50%;
+  
+  transition: all 0.3s;
+  outline: none; // prevent outline when focused
+}
+
+/* could also be done in js */
+#play:hover {
+  background-color: white;
+  color: black;
+}
