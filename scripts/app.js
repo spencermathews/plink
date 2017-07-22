@@ -27,6 +27,20 @@ var canvasCtx = canvas.getContext("2d");
 if (navigator.getUserMedia) {
   console.log('getUserMedia supported.');
 
+  var types = ["video/webm", 
+             "audio/webm", 
+             "video/webm\;codecs=vp8", 
+             "video/webm\;codecs=daala", 
+             "video/webm\;codecs=h264", 
+             "video/mpeg",
+             "audio/ogg",
+             "audio/webm\;codecs=opus",
+             "audio/ogg\;codecs=opus"];
+
+  for (var i in types) { 
+    console.log( "Is " + types[i] + " supported? " + (MediaRecorder.isTypeSupported(types[i]) ? "Maybe!" : "Nope :(")); 
+  }
+
   var constraints = { audio: true };
   var chunks = [];
 
@@ -38,6 +52,7 @@ if (navigator.getUserMedia) {
     record.onclick = function() {
       mediaRecorder.start();
       console.log(mediaRecorder.state);
+      console.log(mediaRecorder.mimeType);
       console.log("recorder started");
       record.style.background = "red";
 
