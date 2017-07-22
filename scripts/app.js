@@ -119,6 +119,27 @@ if (navigator.getUserMedia) {
           clipLabel.textContent = newClipName;
         }
       }
+
+      // Save to Firebase
+      console.log("Saving to Firebase");
+      var d = new Date();
+      var year = d.getFullYear();
+      var month = d.getMonth();
+      var day = d.getDate();
+      var hour = d.getHours();
+      var min = d.getMinutes();
+      var sec = d.getSeconds();
+      time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
+
+      //let storageRef = firebase.storage().ref('/sound/' + time);
+
+      let data = {
+        time: time
+      }
+
+      let databaseRef = firebase.database().ref("tmp").push(data);
+
+
     }
 
     mediaRecorder.ondataavailable = function(e) {
