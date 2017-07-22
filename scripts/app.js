@@ -163,6 +163,7 @@ if (navigator.getUserMedia) {
         // Handle successful uploads on complete
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         var downloadURL = uploadTask.snapshot.downloadURL;
+        console.log(downloadURL);
       });
 
       let data = {
