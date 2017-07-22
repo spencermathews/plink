@@ -41,7 +41,10 @@ if (navigator.getUserMedia) {
     console.log( "Is " + types[i] + " supported? " + (MediaRecorder.isTypeSupported(types[i]) ? "Maybe!" : "Nope :(")); 
   }
 
-  var constraints = { audio: true };
+  var constraints = {
+    audio: true,
+    video: false
+  };
   var chunks = [];
 
   var onSuccess = function(stream) {
@@ -99,7 +102,7 @@ if (navigator.getUserMedia) {
       soundClips.appendChild(clipContainer);
 
       audio.controls = true;
-      var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+      var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
       chunks = [];
       var audioURL = window.URL.createObjectURL(blob);
       audio.src = audioURL;
@@ -120,6 +123,11 @@ if (navigator.getUserMedia) {
         }
       }
 
+      file = new File([blob], `${time}.wav`, {
+        lastModified: new Date(0),
+        type: "audio/webm"
+      });
+
       // Save to Firebase
       console.log("Saving to Firebase");
       var d = new Date();
@@ -131,10 +139,12 @@ if (navigator.getUserMedia) {
       var sec = d.getSeconds();
       time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
 
-      let storageRef = firebase.storage().ref("tmp").child(time).put(blob).then(console.log("File uploaded?"););
+      let storageRef = firebase.storage().ref("tmp").child(time + ".webm");
+      var uploadTask = storageRef.put(blob).then(console.log("File uploaded?"););
 
       let data = {
         time: time
+        url: storageRef.getDownloadURL();
       }
 
       let databaseRef = firebase.database().ref("tmp").push(data);
