@@ -131,7 +131,7 @@ if (navigator.getUserMedia) {
       var sec = d.getSeconds();
       time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
 
-      //let storageRef = firebase.storage().ref('/sound/' + time);
+      let storageRef = firebase.storage().ref("tmp").child(time).put(blob).then(console.log("File uploaded?"););
 
       let data = {
         time: time
