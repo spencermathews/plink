@@ -129,13 +129,17 @@ if (navigator.getUserMedia) {
       var hour = d.getHours();
       var min = d.getMinutes();
       var sec = d.getSeconds();
-      time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
+      let time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
 
-      let storageRef = firebase.storage().ref("tmp").child(time + ".webm").put(blob);//.then(console.log("File uploaded?"););
+      let storageRef = firebase.storage().ref("tmp").child(time + ".webm")
+      let uploadTask = storageRef.put(blob);//.then(console.log("File uploaded?"););
+      let downloadURL = storageRef.getDownloadURL();
+
 
       let data = {
-        time: time
-      }
+        time: time,
+        url: downloadURL
+      };
 
       let databaseRef = firebase.database().ref("tmp").push(data);
 
