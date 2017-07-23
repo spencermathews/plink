@@ -42,6 +42,7 @@ if (navigator.getUserMedia) {
   }
 
   var constraints = { audio: true };
+  var blob;  // added here after putting createClip into function
   var chunks = [];
 
   var onSuccess = function(stream) {
@@ -100,7 +101,7 @@ if (navigator.getUserMedia) {
         soundClips.appendChild(clipContainer);
 
         audio.controls = true;
-        var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+        blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
         chunks = [];
         var audioURL = window.URL.createObjectURL(blob);
         audio.src = audioURL;
