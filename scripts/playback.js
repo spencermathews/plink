@@ -79,13 +79,15 @@ function createClip(clipName, audioURL) {
 var databaseRef = firebase.database().ref("tmp");
 
 // saves audio metadata objects in chronological order as they are added to firebase
-var urls = [];
+var urls;
 var currentIndex;  // index of audio currently playing, is set to 0 when more audio recieved and we need to start at the top
 
 // reads database once and initialize things
 // using ref.on is asynchronous and I'm not ready to commit to a fuzzy start up
 databaseRef.orderByKey().once("value", function(snapshot) {
+  console.log("value once!")
   console.log("Number of db entries:", snapshot.numChildren());
+  urls = [];
   // forEach is necessary to ensure ordering
   snapshot.forEach(function(childSnapshot) {
     // adds next audio to urls array
@@ -127,6 +129,7 @@ databaseRef.orderByKey().once("value", function(snapshot) {
 });
 
 databaseRef.orderByKey().on("value", function(snapshot) {
+  console.log("value on!")
   urls = [];
   snapshot.forEach(function(childSnapshot) {
     urls.push(snapshot.val());
