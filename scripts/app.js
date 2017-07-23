@@ -159,15 +159,16 @@ if (navigator.getUserMedia) {
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         var downloadURL = uploadTask.snapshot.downloadURL;
         console.log("File uploaded: ("+uploadTask.snapshot.totalBytes, "bytes)", downloadURL);
+
+        // Store reference to Database
+        let data = {
+          time: time,
+          downloadURL: downloadURL,
+          date: d.toISOString()        
+        }
+
+        let databaseRef = firebase.database().ref("tmp").push(data);
       });
-
-     let data = {
-        time: time
-      }
-
-    let databaseRef = firebase.database().ref("tmp").push(data);
-
-
     }
 
     mediaRecorder.ondataavailable = function(e) {
