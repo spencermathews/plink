@@ -17,8 +17,6 @@ var canvas = document.querySelector('.visualizer');
 
 stop.disabled = true;
 
-
-
 record.onclick = function() {
   console.log("recorder started");
   record.style.background = "red";
@@ -104,49 +102,43 @@ createClip(clipName, audioURL);
 
 let databaseRef = firebase.database().ref("tmp");
 
+// once-value outputs all initially
 databaseRef.once('value', function(snapshot) {
   snapshot.forEach(function(childSnapshot) {
     var childKey = childSnapshot.key;
     var childData = childSnapshot.val();
     console.log(childKey, childData);
-
   });
 });
 
+// on-value does not output all initially
 databaseRef.on('value', function(snapshot) {
   console.log(snapshot.val());
 });
 
-databaseRef.on('child_added', function(data) {
-  console.log(data.val());
-});
+// returns all existing Objects starting at earliest, then new
+// databaseRef.on('child_added', function(data) {
+//   console.log(data.val());
+// });
 
-console.log(databaseRef.orderByChild('date'));
+// returns nonsense, don't use this way!
+//console.log(databaseRef.orderByChild('date'));
 
-databaseRef.orderByChild("date").on("child_added", function(data) {
-   console.log(data.val().date);
-});
 databaseRef.orderByChild("date").on("child_added", function(snapshot) {
   console.log(snapshot.key, snapshot.val().date);
 });
 
-databaseRef.orderByKey().on("child_added", function(data) {
-   console.log(data.key);
-});
 databaseRef.orderByKey().on("child_added", function(snapshot) {
   console.log(snapshot.key);
 });
 
-databaseRef.orderByValue().on("value", function(data) {
-   data.forEach(function(data) {
-      console.log(data.key, data.val());
-   });
-});
 databaseRef.orderByValue().on("value", function(snapshot) {
   snapshot.forEach(function(data) {
     console.log(data.key, data.val());
   });
 });
+
+console.log("End of JS");
 
 
 
