@@ -174,6 +174,14 @@ if (navigator.getUserMedia) {
         }
 
         let databaseRef = firebase.database().ref("tmp").push(data);
+
+        // create new clip element referencing the data on firebase
+        clipName = d.toISOString();
+        console.log(clipName);
+        //var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+        //chunks = [];
+        audioURL = downloadURL;
+        createClip(clipName, blob);
       });
     }
 
