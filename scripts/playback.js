@@ -39,6 +39,7 @@ function createClip(clipName, audioURL) {
  
   clipContainer.classList.add('clip');
   audio.setAttribute('controls', '');
+  //audio.setAttribute('autoplay', '');
   deleteButton.textContent = 'Delete';
   deleteButton.className = 'delete';
 
@@ -74,21 +75,33 @@ function createClip(clipName, audioURL) {
   }
 }
 
-// create new clip element
+// initialize clip element
 var clipName = null;
 var audioURL = null;
 createClip(clipName, audioURL);
 
+// maintain one clip audio element for everything
 var clip = document.querySelector('.clip');
 
-let databaseRef = firebase.database().ref("tmp");
+var databaseRef = firebase.database().ref("tmp");
+
+// save audio metadata objects in chronological order as they are added to firebase
+var urls = [];
 
 databaseRef.orderByKey().on("child_added", function(snapshot) {
-  console.log(snapshot.key);
-  console.log(snapshot.val())
-  clip.querySelector('audio').src = snapshot.val().downloadURL;
-  clip.querySelector('p').textContent = snapshot.val().date;
-  console.log(clip.querySelector('audio').src, clip.querySelector('p').textContent);
+  //console.log(snapshot.key);
+  //console.log(snapshot.val());
+
+  // add new database object with downloadURL and date properties
+  urls.push(snapshot.val());
+
+  var downloadURL = snapshot.val().downloadURL;
+  var date = snapshot.val().date;
+
+  // immediately updates player with new file
+  clip.querySelector('audio').src = downloadURL;
+  clip.querySelector('p').textContent = date;
+  //console.log(clip.querySelector('audio').src, clip.querySelector('p').textContent);
 });
 
 
