@@ -42,7 +42,6 @@ if (navigator.getUserMedia) {
   }
 
   var constraints = { audio: true };
-  var blob;  // added here after putting createClip into function
   var chunks = [];
 
   var onSuccess = function(stream) {
@@ -76,9 +75,8 @@ if (navigator.getUserMedia) {
     mediaRecorder.onstop = function(e) {
       console.log("data available after MediaRecorder.stop() called.");
 
-      function createClip() {
-        var clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
-        console.log(clipName);
+      function createClip(clipName, blob) {
+        // clipName was here
         var clipContainer = document.createElement('article');
         var clipLabel = document.createElement('p');
         var audio = document.createElement('audio');
@@ -101,9 +99,8 @@ if (navigator.getUserMedia) {
         soundClips.appendChild(clipContainer);
 
         audio.controls = true;
-        blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
-        chunks = [];
-        var audioURL = window.URL.createObjectURL(blob);
+        // blob was here
+        // audioURL was here
         audio.src = audioURL;
         console.log("recorder stopped");
 
@@ -122,7 +119,12 @@ if (navigator.getUserMedia) {
           }
         }
       }
-      createClip();
+      var clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
+      console.log(clipName);
+      var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+      chunks = [];
+      var audioURL = window.URL.createObjectURL(blob);
+      createClip(clipName, blob);
 
       // Save to Firebase
       console.log("Saving to Firebase");
