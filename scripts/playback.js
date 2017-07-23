@@ -79,30 +79,29 @@ function createClip(clipName, audioURL) {
 var databaseRef = firebase.database().ref("tmp");
 
 // saves audio metadata objects in chronological order as they are added to firebase
-var urls;
+var urls = [];
 var currentIndex;  // index of audio currently playing, is set to 0 when more audio recieved and we need to start at the top
 
 // reads database once and initialize things
 // using ref.on is asynchronous and I'm not ready to commit to a fuzzy start up
 databaseRef.orderByKey().once("value", function(snapshot) {
   console.log("value once!")
-  console.log("Number of db entries:", snapshot.numChildren());
-  urls = [];
+  // ugly but correct way to clear array
+  urls.splice(0,urls.length);
   // forEach is necessary to ensure ordering
   snapshot.forEach(function(childSnapshot) {
     // adds next audio to urls array
     urls.push(childSnapshot.val());
   });
-  console.log("Size of urls array:", urls.length);
-
-  console.log(urls);
-  console.log(urls[urls.length-1]);
+  //console.log("Number of db entries:", snapshot.numChildren());
+  //console.log("Size of urls array:", urls.length);
 
   // creates and initializes audio element
   currentIndex = urls.length-1;
   var audioURL = urls[currentIndex].downloadURL;
   var clipName = urls[currentIndex].date;
   createClip(clipName, audioURL);
+  console.log("First audio ["+currentIndex+"]", clipName, audioURL);
 
   var audio = document.querySelector('audio');
   audio.play();
@@ -111,29 +110,34 @@ databaseRef.orderByKey().once("value", function(snapshot) {
   audio.addEventListener('ended', function (e) {
     //audio.currentTime = 0;  // may be necessary or else callback might only be called once, and may be necessary to pause before
     console.log('Audio ended: duration', audio.duration);
+    audio.pause();  // may not be necessary
 
     if (currentIndex > 0) {
       currentIndex--;
     } else {
       currentIndex = urls.length-1;
     }
+    var audioURL = urls[currentIndex].downloadURL;
     var clipName = urls[currentIndex].date;
+    console.log("Next audio ["+currentIndex+"]", clipName, audioURL);
 
-    //clip.querySelector('audio')
-    audio.src = urls[currentIndex].downloadURL;
-    //clip.querySelector('p').
-    audio.nextSibling.textContent = urls[currentIndex].date;  // next sibling is p
+    audio.src = audioURL;
+    audio.nextSibling.textContent = clipName;  // next sibling is p
 
-     audio.play();
+    audio.play();
   }, false);
 });
 
 databaseRef.orderByKey().on("value", function(snapshot) {
-  console.log("value on!")
-  urls = [];
+  console.log("value on!");
+  // ugly but right way to clear array
+  urls.splice(0,urls.length);
   snapshot.forEach(function(childSnapshot) {
-    urls.push(snapshot.val());
+    urls.push(childSnapshot.val());
   });
+  console.log("Number of db entries:", snapshot.numChildren());
+  console.log("Size of urls array:", urls.length);
+
   // reset current index to 0 so we restart at last index (most recent) next 
   curentIndex = 0;
 });
