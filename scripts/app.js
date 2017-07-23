@@ -133,11 +133,6 @@ if (navigator.getUserMedia) {
 
       let storageRef = firebase.storage().ref("tmp").child(time + ".webm")
       let uploadTask = storageRef.put(blob);
-      // then is redundant when using the state_changed event listener
-      uploadTask.then(function(snapshot) {
-        console.log("File uploaded: ("+snapshot.totalBytes, "bytes)", snapshot.downloadURL,);
-      });
-      console.log(uploadTask);
 
       // from https://firebase.google.com/docs/storage/web/upload-files, see also https://firebase.google.com/docs/reference/js/firebase.storage.UploadTask
       // Register three observers:
@@ -163,14 +158,14 @@ if (navigator.getUserMedia) {
         // Handle successful uploads on complete
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         var downloadURL = uploadTask.snapshot.downloadURL;
-        console.log(downloadURL);
+        console.log("File uploaded: ("+uploadTask.snapshot.totalBytes, "bytes)", downloadURL);
       });
 
-      let data = {
+     let data = {
         time: time
       }
 
-      let databaseRef = firebase.database().ref("tmp").push(data);
+    let databaseRef = firebase.database().ref("tmp").push(data);
 
 
     }
