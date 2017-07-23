@@ -75,7 +75,7 @@ if (navigator.getUserMedia) {
     mediaRecorder.onstop = function(e) {
       console.log("data available after MediaRecorder.stop() called.");
 
-      function createClip(clipName, blob) {
+      function createClip(clipName, audioURL) {
         // clipName was here
         var clipContainer = document.createElement('article');
         var clipLabel = document.createElement('p');
@@ -124,7 +124,7 @@ if (navigator.getUserMedia) {
       var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
       chunks = [];
       var audioURL = window.URL.createObjectURL(blob);
-      createClip(clipName, blob);
+      createClip(clipName, audioURL);
 
       // Save to Firebase
       console.log("Saving to Firebase");
@@ -181,7 +181,7 @@ if (navigator.getUserMedia) {
         //var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
         //chunks = [];
         audioURL = downloadURL;
-        createClip(clipName, blob);
+        createClip(clipName, audioURL);
       });
     }
 
