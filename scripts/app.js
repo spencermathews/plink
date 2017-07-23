@@ -75,50 +75,53 @@ if (navigator.getUserMedia) {
     mediaRecorder.onstop = function(e) {
       console.log("data available after MediaRecorder.stop() called.");
 
-      var clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
-      console.log(clipName);
-      var clipContainer = document.createElement('article');
-      var clipLabel = document.createElement('p');
-      var audio = document.createElement('audio');
-      var deleteButton = document.createElement('button');
-     
-      clipContainer.classList.add('clip');
-      audio.setAttribute('controls', '');
-      deleteButton.textContent = 'Delete';
-      deleteButton.className = 'delete';
+      function createClip() {
+        var clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
+        console.log(clipName);
+        var clipContainer = document.createElement('article');
+        var clipLabel = document.createElement('p');
+        var audio = document.createElement('audio');
+        var deleteButton = document.createElement('button');
+       
+        clipContainer.classList.add('clip');
+        audio.setAttribute('controls', '');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'delete';
 
-      if(clipName === null) {
-        clipLabel.textContent = 'My unnamed clip';
-      } else {
-        clipLabel.textContent = clipName;
-      }
-
-      clipContainer.appendChild(audio);
-      clipContainer.appendChild(clipLabel);
-      clipContainer.appendChild(deleteButton);
-      soundClips.appendChild(clipContainer);
-
-      audio.controls = true;
-      var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
-      chunks = [];
-      var audioURL = window.URL.createObjectURL(blob);
-      audio.src = audioURL;
-      console.log("recorder stopped");
-
-      deleteButton.onclick = function(e) {
-        evtTgt = e.target;
-        evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-      }
-
-      clipLabel.onclick = function() {
-        var existingName = clipLabel.textContent;
-        var newClipName = prompt('Enter a new name for your sound clip?');
-        if(newClipName === null) {
-          clipLabel.textContent = existingName;
+        if(clipName === null) {
+          clipLabel.textContent = 'My unnamed clip';
         } else {
-          clipLabel.textContent = newClipName;
+          clipLabel.textContent = clipName;
+        }
+
+        clipContainer.appendChild(audio);
+        clipContainer.appendChild(clipLabel);
+        clipContainer.appendChild(deleteButton);
+        soundClips.appendChild(clipContainer);
+
+        audio.controls = true;
+        var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+        chunks = [];
+        var audioURL = window.URL.createObjectURL(blob);
+        audio.src = audioURL;
+        console.log("recorder stopped");
+
+        deleteButton.onclick = function(e) {
+          evtTgt = e.target;
+          evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+        }
+
+        clipLabel.onclick = function() {
+          var existingName = clipLabel.textContent;
+          var newClipName = prompt('Enter a new name for your sound clip?');
+          if(newClipName === null) {
+            clipLabel.textContent = existingName;
+          } else {
+            clipLabel.textContent = newClipName;
+          }
         }
       }
+      createClip();
 
       // Save to Firebase
       console.log("Saving to Firebase");
