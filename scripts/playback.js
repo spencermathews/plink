@@ -20,9 +20,6 @@ stop.disabled = true;
 
 
 record.onclick = function() {
-  mediaRecorder.start();
-  console.log(mediaRecorder.state);
-  console.log(mediaRecorder.mimeType);
   console.log("recorder started");
   record.style.background = "red";
 
@@ -31,19 +28,15 @@ record.onclick = function() {
 }
 
 stop.onclick = function() {
-  mediaRecorder.stop();
-  console.log(mediaRecorder.state);
-  console.log("recorder stopped");
   record.style.background = "";
   record.style.color = "";
-  // mediaRecorder.requestData();
 
   stop.disabled = true;
   record.disabled = false;
 }
 
 
-function createClip(clipName, blob) {
+function createClip(clipName, downloadURL) {
   // clipName was here
   var clipContainer = document.createElement('article');
   var clipLabel = document.createElement('p');
@@ -87,69 +80,73 @@ function createClip(clipName, blob) {
     }
   }
 }
-var clipName = 'My unnamed clip'; //prompt('Enter a name for your sound clip?','My unnamed clip');
-//console.log(clipName);
-var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
-chunks = [];
-var audioURL = window.URL.createObjectURL(blob);
-createClip(clipName, blob);
+
+// create new clip element referencing the data on firebase
+clipName = "tmp";//d.toISOString();
+audioURL = "tmp";//downloadURL;
+createClip(clipName, audioURL);
+
 
 // Save to Firebase
-console.log("Saving to Firebase");
-var d = new Date();
-var year = d.getFullYear();
-var month = d.getMonth();
-var day = d.getDate();
-var hour = d.getHours();
-var min = d.getMinutes();
-var sec = d.getSeconds();
-let time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
 
-let storageRef = firebase.storage().ref("tmp").child(time + ".webm")
-let uploadTask = storageRef.put(blob);
+//let storageRef = firebase.storage().ref("tmp").child(time + ".webm")
+//let uploadTask = storageRef.put(blob);
 
-// from https://firebase.google.com/docs/storage/web/upload-files, see also https://firebase.google.com/docs/reference/js/firebase.storage.UploadTask
-// Register three observers:
-// 1. 'state_changed' (firebase.storage.TaskEvent.STATE_CHANGED) observer, called any time the state changes
-// 2. Error observer, called on failure
-// 3. Completion observer, called on successful completion
-uploadTask.on('state_changed', function(snapshot){
-  // Observe state change events such as progress, pause, and resume
-  // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-  var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-  console.log('Upload is ' + progress + '% done');
-  switch (snapshot.state) {
-    case firebase.storage.TaskState.PAUSED: // or 'paused'
-      console.log('Upload is paused');
-      break;
-    case firebase.storage.TaskState.RUNNING: // or 'running'
-      console.log('Upload is running');
-      break;
-  }
-}, function(error) {
-  // Handle unsuccessful uploads
-}, function() {
-  // Handle successful uploads on complete
-  // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-  var downloadURL = uploadTask.snapshot.downloadURL;
-  console.log("File uploaded: ("+uploadTask.snapshot.totalBytes, "bytes)", downloadURL);
+//var downloadURL = uploadTask.snapshot.downloadURL;
+//console.log("File uploaded: ("+uploadTask.snapshot.totalBytes, "bytes)", downloadURL);
 
-  // Store reference to Database
-  let data = {
-    time: time,
-    downloadURL: downloadURL,
-    date: d.toISOString()        
-  }
+// Store reference to Database
+// let data = {
+//   time: time,
+//   downloadURL: downloadURL,
+//   date: d.toISOString()        
+// }
 
-  let databaseRef = firebase.database().ref("tmp").push(data);
+let databaseRef = firebase.database().ref("tmp");
 
-  // create new clip element referencing the data on firebase
-  clipName = d.toISOString();
-  //console.log(clipName);
-  //var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
-  //chunks = [];
-  audioURL = downloadURL;
-  createClip(clipName, blob);
+databaseRef.once('value', function(snapshot) {
+  snapshot.forEach(function(childSnapshot) {
+    var childKey = childSnapshot.key;
+    var childData = childSnapshot.val();
+    console.log(childKey, childData);
+
+  });
 });
+
+databaseRef.on('value', function(snapshot) {
+  console.log(snapshot.val());
+});
+
+databaseRef.on('child_added', function(data) {
+  console.log(data.val());
+});
+
+console.log(databaseRef.orderByChild('date'));
+
+databaseRef.orderByChild("date").on("child_added", function(data) {
+   console.log(data.val().date);
+});
+databaseRef.orderByChild("date").on("child_added", function(snapshot) {
+  console.log(snapshot.key, snapshot.val().date);
+});
+
+databaseRef.orderByKey().on("child_added", function(data) {
+   console.log(data.key);
+});
+databaseRef.orderByKey().on("child_added", function(snapshot) {
+  console.log(snapshot.key);
+});
+
+databaseRef.orderByValue().on("value", function(data) {
+   data.forEach(function(data) {
+      console.log(data.key, data.val());
+   });
+});
+databaseRef.orderByValue().on("value", function(snapshot) {
+  snapshot.forEach(function(data) {
+    console.log(data.key, data.val());
+  });
+});
+
 
 
