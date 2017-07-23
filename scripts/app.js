@@ -119,8 +119,8 @@ if (navigator.getUserMedia) {
           }
         }
       }
-      var clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
-      console.log(clipName);
+      var clipName = 'My unnamed clip'; //prompt('Enter a name for your sound clip?','My unnamed clip');
+      //console.log(clipName);
       var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
       chunks = [];
       var audioURL = window.URL.createObjectURL(blob);
@@ -177,7 +177,7 @@ if (navigator.getUserMedia) {
 
         // create new clip element referencing the data on firebase
         clipName = d.toISOString();
-        console.log(clipName);
+        //console.log(clipName);
         //var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
         //chunks = [];
         audioURL = downloadURL;
