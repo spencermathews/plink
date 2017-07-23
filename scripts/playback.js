@@ -82,6 +82,10 @@ var databaseRef = firebase.database().ref("tmp");
 var urls = [];
 var currentIndex;  // index of audio currently playing, is set to 0 when more audio recieved and we need to start at the top
 
+function resetIndex() {
+   currentIndex = 0;
+}
+
 // reads database once and initialize things
 // using ref.on is asynchronous and I'm not ready to commit to a fuzzy start up
 databaseRef.orderByKey().once("value", function(snapshot) {
@@ -139,7 +143,7 @@ databaseRef.orderByKey().on("value", function(snapshot) {
   console.log("Size of urls array:", urls.length);
 
   // reset current index to 0 so we restart at last index (most recent) next 
-  curentIndex = 0;
+  resetIndex();
 });
 
 console.log("End of JS");
