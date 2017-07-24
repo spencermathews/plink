@@ -75,6 +75,33 @@ function createClip(clipName, audioURL) {
   }
 }
 
+// creates and initializes audio element
+var audioURL = '';  // if null will try to fetch and give 404, even if not playing
+var clipName = 'Nothing here yet';
+createClip(clipName, audioURL);
+
+var audio = document.querySelector('audio');
+
+// sets callback for when audio completes
+audio.addEventListener('ended', function (e) {
+  //audio.currentTime = 0;  // may be necessary or else callback might only be called once, and may be necessary to pause before
+  console.log('Audio ended: duration', audio.duration);
+  audio.pause();  // may not be necessary
+
+  if (currentIndex > 0) {
+    currentIndex--;
+  } else {
+    currentIndex = urls.length-1;
+  }
+  var audioURL = urls[currentIndex].downloadURL;
+  var clipName = urls[currentIndex].date;
+  console.log("Next audio ["+currentIndex+"]", clipName, audioURL);
+  audio.src = audioURL;
+  audio.nextSibling.textContent = clipName;  // next sibling is p
+
+  audio.play();
+}, false);
+
 
 var databaseRef = firebase.database().ref("tmp");
 
@@ -82,9 +109,6 @@ var databaseRef = firebase.database().ref("tmp");
 var urls = [];
 var currentIndex;  // index of audio currently playing, is set to 0 when more audio recieved and we need to start at the top
 
-function resetIndex() {
-   currentIndex = 0;
-}
 
 // reads database once and initialize things
 // using ref.on is asynchronous and I'm not ready to commit to a fuzzy start up
@@ -100,36 +124,14 @@ databaseRef.orderByKey().once("value", function(snapshot) {
   //console.log("Number of db entries:", snapshot.numChildren());
   //console.log("Size of urls array:", urls.length);
 
-  // creates and initializes audio element
   currentIndex = urls.length-1;
   var audioURL = urls[currentIndex].downloadURL;
   var clipName = urls[currentIndex].date;
-  createClip(clipName, audioURL);
   console.log("First audio ["+currentIndex+"]", clipName, audioURL);
+  audio.src = audioURL;
+  audio.nextSibling.textContent = clipName;  // next sibling is p
 
-  var audio = document.querySelector('audio');
   audio.play();
-
-  // sets callback for when audio completes
-  audio.addEventListener('ended', function (e) {
-    //audio.currentTime = 0;  // may be necessary or else callback might only be called once, and may be necessary to pause before
-    console.log('Audio ended: duration', audio.duration);
-    audio.pause();  // may not be necessary
-
-    if (currentIndex > 0) {
-      currentIndex--;
-    } else {
-      currentIndex = urls.length-1;
-    }
-    var audioURL = urls[currentIndex].downloadURL;
-    var clipName = urls[currentIndex].date;
-    console.log("Next audio ["+currentIndex+"]", clipName, audioURL);
-
-    audio.src = audioURL;
-    audio.nextSibling.textContent = clipName;  // next sibling is p
-
-    audio.play();
-  }, false);
 });
 
 databaseRef.orderByKey().on("value", function(snapshot) {
@@ -145,6 +147,10 @@ databaseRef.orderByKey().on("value", function(snapshot) {
   // reset current index to 0 so we restart at last index (most recent) next 
   resetIndex();
 });
+
+function resetIndex() {
+   currentIndex = 0;
+}
 
 console.log("End of JS");
 
