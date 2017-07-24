@@ -152,6 +152,50 @@ function resetIndex() {
    currentIndex = 0;
 }
 
+
+// diff-cam-engine diff-cam-example
+
+var isTargetInSight = false;
+var lostTimeout;
+var timeOut = 5000;
+
+function initSuccess() {
+  DiffCamEngine.start();
+}
+
+function initError() {
+  alert('Something went wrong.');
+}
+
+function capture(payload) {
+  if(payload.hasMotion) {    
+    if (!isTargetInSight) {
+      console.log('Motion detected');
+      isTargetInSight = true;
+      document.body.style.backgroundColor = 'red';
+      audio.play();
+    }
+
+    clearTimeout(lostTimeout);
+    lostTimeout = setTimeout(declareLost, timeOut);
+  }
+}
+
+// object detection routine adapted from turret-security example
+function declareLost() {
+  console.log('Motion lost');
+  isTargetInSight = false;
+  document.body.style.backgroundColor = null;
+  audio.pause();
+}
+
+DiffCamEngine.init({
+  initSuccessCallback: initSuccess,
+  initErrorCallback: initError,
+  captureCallback: capture
+});
+
+
 console.log("End of JS");
 
 // IGNORE BELOW
