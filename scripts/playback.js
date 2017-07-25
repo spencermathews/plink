@@ -192,7 +192,10 @@ function declareLost() {
 DiffCamEngine.init({
   initSuccessCallback: initSuccess,
   initErrorCallback: initError,
-  captureCallback: capture
+  captureCallback: capture,
+  captureInterval: 1000,
+  captureWidth: 64,
+  captureHeight: 48
 });
 
 
