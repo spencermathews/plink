@@ -1,5 +1,7 @@
 Note: For some unknown reason gh-pages did not automatically serve index.html until I removed the webapp junk.
 
+Currently hard coded for use on Chrome, using audio/webm (Firefox uses audio/ogg).
+
 ---
 
 A sample MDN app that uses getUserMedia and MediaRecorder API for recording audio snippets, and The Web Audio API for visualizations.

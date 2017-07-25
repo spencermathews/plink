@@ -10,12 +10,18 @@ navigator.getUserMedia = ( navigator.getUserMedia ||
 
 var record = document.querySelector('.record');
 var stop = document.querySelector('.stop');
+var save = document.querySelector('.save');
 var soundClips = document.querySelector('.sound-clips');
 var canvas = document.querySelector('.visualizer');
 
 // disable stop button while not recording
 
 stop.disabled = true;
+save.disabled = true;
+
+// grey out disabled buttons
+stop.style.background = "gray";
+save.style.background = "gray";
 
 // visualiser setup - create web audio api context and canvas
 
@@ -55,8 +61,11 @@ if (navigator.getUserMedia) {
       console.log(mediaRecorder.mimeType);
       console.log("recorder started");
       record.style.background = "red";
+      save.style.background = "gray";
+      stop.style.background = "";
 
       stop.disabled = false;
+      save.disabled = true;
       record.disabled = true;
     }
 
@@ -66,11 +75,27 @@ if (navigator.getUserMedia) {
       console.log("recorder stopped");
       record.style.background = "";
       record.style.color = "";
+      stop.style.background = "gray";
+      save.style.background = "";
       // mediaRecorder.requestData();
 
+      save.disabled = false;
       stop.disabled = true;
       record.disabled = false;
     }
+
+    save.onclick = function() {
+      console.log("saving to firebase");
+      record.style.background = "";
+      stop.style.background = "gray";
+      save.style.background = "gray";
+      // mediaRecorder.requestData();
+
+      save.disabled = true;
+      stop.disabled = true;
+      record.disabled = false;
+    }
+
 
     mediaRecorder.onstop = function(e) {
       console.log("data available after MediaRecorder.stop() called.");
