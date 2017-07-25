@@ -53,6 +53,10 @@ if (navigator.getUserMedia) {
   var onSuccess = function(stream) {
     var mediaRecorder = new MediaRecorder(stream);
 
+    // mades blob and audioURL local to onSuccess to we can it from save.onclick to upload and then delete
+    var blob;
+    var audioURL;
+
     visualize(stream);
 
     record.onclick = function() {
@@ -67,6 +71,8 @@ if (navigator.getUserMedia) {
       stop.disabled = false;
       save.disabled = true;
       record.disabled = true;
+
+      deleteLastClip();
     }
 
     stop.onclick = function() {
@@ -94,79 +100,6 @@ if (navigator.getUserMedia) {
       save.disabled = true;
       stop.disabled = true;
       record.disabled = false;
-    }
-
-
-    mediaRecorder.onstop = function(e) {
-      console.log("data available after MediaRecorder.stop() called.");
-
-      function createClip(clipName, audioURL) {
-        // clipName was here
-        var clipContainer = document.createElement('article');
-        var clipLabel = document.createElement('p');
-        var audio = document.createElement('audio');
-        var deleteButton = document.createElement('button');
-       
-        clipContainer.classList.add('clip');
-        audio.setAttribute('controls', '');
-        deleteButton.textContent = 'Delete';
-        deleteButton.className = 'delete';
-
-        if(clipName === null) {
-          clipLabel.textContent = 'My unnamed clip';
-        } else {
-          clipLabel.textContent = clipName;
-        }
-
-        clipContainer.appendChild(audio);
-        clipContainer.appendChild(clipLabel);
-        clipContainer.appendChild(deleteButton);
-        soundClips.appendChild(clipContainer);
-
-        audio.controls = true;
-        // blob was here
-        // audioURL was here
-        audio.src = audioURL;
-        console.log("recorder stopped");
-
-        deleteButton.onclick = function(e) {
-          evtTgt = e.target;
-          evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
- 
-          // added to allow garbage collection of blobs
-          // variable binding seems to occur and persist, so we can reference audioURL and deleteButton
-          // and they will refer to the values current on binding!?
-          // we'd also want to null blob if there were more references to it around
-          // all three ways of obtaining src are equivalent and equal to originally audioURL
-          // note must get src before removing elements but not if using audioURL 
-          //let src = evtTgt.parentNode.querySelector("audio").src;
-          //let src = this.parentNode.querySelector("audio").src;
-          //let src = deleteButton.parentNode.querySelector("audio").src;
-          // console.log(src, audioURL);
-          // if (src.includes("blob")) {
-          //   window.URL.revokeObjectURL(src);
-          // }
-          if (audioURL.includes("blob")) {
-            window.URL.revokeObjectURL(audioURL);
-          }
-        }
-
-        clipLabel.onclick = function() {
-          var existingName = clipLabel.textContent;
-          var newClipName = prompt('Enter a new name for your sound clip?');
-          if(newClipName === null) {
-            clipLabel.textContent = existingName;
-          } else {
-            clipLabel.textContent = newClipName;
-          }
-        }
-      }
-      var clipName = 'My unnamed clip'; //prompt('Enter a name for your sound clip?','My unnamed clip');
-      //console.log(clipName);
-      var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
-      chunks = [];
-      var audioURL = window.URL.createObjectURL(blob);
-      createClip(clipName, audioURL);
 
       // Save to Firebase
       console.log("Saving to Firebase");
@@ -179,8 +112,12 @@ if (navigator.getUserMedia) {
       var sec = d.getSeconds();
       let time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
 
+      // for whatever reason blob, which is local to parent function onSuccess, is
+      console.log("Uploading blob of size", blob.size, "and type", blob.type);
       let storageRef = firebase.storage().ref("tmp").child(time + ".webm")
       let uploadTask = storageRef.put(blob);
+
+      deleteLastClip();
 
       // from https://firebase.google.com/docs/storage/web/upload-files, see also https://firebase.google.com/docs/reference/js/firebase.storage.UploadTask
       // Register three observers:
@@ -202,6 +139,7 @@ if (navigator.getUserMedia) {
         }
       }, function(error) {
         // Handle unsuccessful uploads
+        console.log('Upload failed!');
       }, function() {
         // Handle successful uploads on complete
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
@@ -227,9 +165,93 @@ if (navigator.getUserMedia) {
       });
     }
 
+    function deleteLastClip() {
+      var clip = soundClips.lastElementChild;  // when used lastElement then got text node of comments, even though soundClips.children.length was 0! Looks like childElementCount would be better
+      if(clip) {
+        window.URL.revokeObjectURL(clip.firstChild.src);  // this should be equal to audioURL at this point, not a problem if we end up calling on a URL that is not a blob
+        soundClips.removeChild(clip);  // should not throw error even if there is no last child
+        // we might be tempted to null blob here, but not necessary since we're reusing the blob variable
+      }
+    }
+
+    // triggered when stop button stops the MediaRecorder
+    mediaRecorder.onstop = function(e) {
+      console.log("data available after MediaRecorder.stop() called.");
+
+      var clipName = ''; //prompt('Enter a name for your sound clip?','My unnamed clip');
+      //console.log(clipName);
+      blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+      chunks = [];
+      audioURL = window.URL.createObjectURL(blob);
+      createClip(clipName, audioURL).play();
+    }
+
     mediaRecorder.ondataavailable = function(e) {
       chunks.push(e.data);
     }
+  }
+
+  function createClip(clipName, audioURL) {
+    // clipName was here
+    var clipContainer = document.createElement('article');
+    var clipLabel = document.createElement('p');
+    var audio = document.createElement('audio');
+    var deleteButton = document.createElement('button');
+   
+    clipContainer.classList.add('clip');
+    audio.setAttribute('controls', '');
+    deleteButton.textContent = 'Delete';
+    deleteButton.className = 'delete';
+
+    if(clipName === null) {
+      clipLabel.textContent = 'My unnamed clip';
+    } else {
+      clipLabel.textContent = clipName;
+    }
+
+    clipContainer.appendChild(audio);
+    clipContainer.appendChild(clipLabel);
+    clipContainer.appendChild(deleteButton);
+    soundClips.appendChild(clipContainer);
+
+    audio.controls = true;
+    // blob was here
+    // audioURL was here
+    audio.src = audioURL;
+    console.log("recorder stopped");
+
+    deleteButton.onclick = function(e) {
+      evtTgt = e.target;
+      evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+
+      // added to allow garbage collection of blobs
+      // variable binding seems to occur and persist, so we can reference audioURL and deleteButton
+      // and they will refer to the values current on binding!?
+      // we'd also want to null blob if there were more references to it around
+      // all three ways of obtaining src are equivalent and equal to originally audioURL
+      // note must get src before removing elements but not if using audioURL 
+      //let src = evtTgt.parentNode.querySelector("audio").src;
+      //let src = this.parentNode.querySelector("audio").src;
+      //let src = deleteButton.parentNode.querySelector("audio").src;
+      // console.log(src, audioURL);
+      // if (src.includes("blob")) {
+      //   window.URL.revokeObjectURL(src);
+      // }
+      if (audioURL.includes("blob")) {
+        window.URL.revokeObjectURL(audioURL);
+      }
+    }
+
+    clipLabel.onclick = function() {
+      var existingName = clipLabel.textContent;
+      var newClipName = prompt('Enter a new name for your sound clip?');
+      if(newClipName === null) {
+        clipLabel.textContent = existingName;
+      } else {
+        clipLabel.textContent = newClipName;
+      }
+    }
+    return audio;
   }
 
   var onError = function(err) {
