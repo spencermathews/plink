@@ -1,33 +1,6 @@
 // set up basic variables for app
 
-var record = document.querySelector('.record');
-var stop = document.querySelector('.stop');
 var soundClips = document.querySelector('.sound-clips');
-var canvas = document.querySelector('.visualizer');
-
-// hide elements we don't need
-record.style.display = 'none';
-stop.style.display = 'none';
-canvas.style.display = 'none';
-
-// disable stop button while not recording
-
-stop.disabled = true;
-
-record.onclick = function() {
-  record.style.background = "red";
-
-  stop.disabled = false;
-  record.disabled = true;
-}
-
-stop.onclick = function() {
-  record.style.background = "";
-  record.style.color = "";
-
-  stop.disabled = true;
-  record.disabled = false;
-}
 
 
 function createClip(clipName, audioURL) {
@@ -153,61 +126,3 @@ function resetIndex() {
 }
 
 console.log("End of JS");
-
-// IGNORE BELOW
-
-// perhaps a more clever proach could include using child_added instead of value callback so only new entries are returned
-// but that would require manicuring urls array manually instead of just dumping it from the snapshot
-// databaseRef.orderByKey().on("child_added", function(snapshot) {
-//   //console.log(snapshot.key);
-//   //console.log(snapshot.val());
-
-//   // add new database object with downloadURL and date properties
-//   urls.push(snapshot.val());
-
-//   console.log(currentURLIndex, '/', snapshot.numChildren());
-
-//   //var downloadURL = snapshot.val().downloadURL;
-//   //var date = snapshot.val().date;
-//   // immediately updates player with new file
-//   //clip.querySelector('audio').src = downloadURL;
-//   //clip.querySelector('p').textContent = date;
-//   //console.log(clip.querySelector('audio').src, clip.querySelector('p').textContent);
-// });
-
-// on-value returns an object so we have to iterate
-// doesn't make sense to order by value if values are objects!
-// databaseRef.orderByValue().on("value", function(snapshot) {
-//   snapshot.forEach(function(data) {
-//     console.log(data.key, data.val());
-//   });
-// });
-
-// once-value outputs all as snapshot object initially and on change, ordered first to last by key it appears
-// databaseRef.once('value', function(snapshot) {
-//   snapshot.forEach(function(childSnapshot) {
-//     var childKey = childSnapshot.key;
-//     var childData = childSnapshot.val();
-//     console.log(childKey, childData);
-//   });
-// });
-
-// on-value dumps entire object on value change, and seems like it does initially as well
-// databaseRef.on('value', function(snapshot) {
-//   console.log(snapshot.val());
-// });
-
-// returns all existing Objects starting at earliest, then new
-// databaseRef.on('child_added', function(data) {
-//   console.log(data.val());
-// });
-
-// returns nonsense, don't use this way!
-//console.log(databaseRef.orderByChild('date'));
-
-// most obvious way, but unnecessary since push-keys are automatically chronological
-// databaseRef.orderByChild("date").on("child_added", function(snapshot) {
-//   console.log(snapshot.key, snapshot.val().date);
-// });
-
-
