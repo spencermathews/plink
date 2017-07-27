@@ -12,7 +12,7 @@ function createClip(clipName, audioURL) {
  
   clipContainer.classList.add('clip');
   audio.setAttribute('controls', '');
-  //audio.setAttribute('autoplay', '');
+  audio.setAttribute('preload', 'metadata');  // prevent auto download
   deleteButton.textContent = 'Delete';
   deleteButton.className = 'delete';
 
@@ -46,83 +46,43 @@ function createClip(clipName, audioURL) {
       clipLabel.textContent = newClipName;
     }
   }
+
+  // sets callback for when audio completes
+  audio.addEventListener('ended', function (e) {
+    console.log('Audio ended: duration', audio.duration);
+    evtTgt = e.target;
+
+    // Play next clip if there is one
+    try {
+      nextAudioElement = evtTgt.parentNode.nextElementSibling.firstElementChild;
+      nextAudioElement.play();
+    } catch (e) {
+      console.log(e);
+    }
+  }, false);
+
+  audio.addEventListener('play', function (e) {
+    evtTgt = e.target;
+    console.log('readyState:', evtTgt.readyState);
+    var bufferedTimeRanges = evtTgt.buffered;
+    console.log('buffered:', bufferedTimeRanges, bufferedTimeRanges.start(0), bufferedTimeRanges.end(bufferedTimeRanges.length-1));
+    var seekableTimeRanges = evtTgt.seekable;
+    console.log('seekable:', seekableTimeRanges, seekableTimeRanges.start(0), seekableTimeRanges.end(bufferedTimeRanges.length-1));
+  }, false);
+  // TODO add listener that stops other audio when play another
+  // TODO change color to highlight currently playing
+  // TODO print out length of clip in player
 }
-
-// creates and initializes audio element
-var audioURL = '';  // if null will try to fetch and give 404, even if not playing
-var clipName = 'Nothing here yet';
-createClip(clipName, audioURL);
-
-var audio = document.querySelector('audio');
-
-// sets callback for when audio completes
-audio.addEventListener('ended', function (e) {
-  //audio.currentTime = 0;  // may be necessary or else callback might only be called once, and may be necessary to pause before
-  console.log('Audio ended: duration', audio.duration);
-  audio.pause();  // may not be necessary
-
-  if (currentIndex > 0) {
-    currentIndex--;
-  } else {
-    currentIndex = urls.length-1;
-  }
-  var audioURL = urls[currentIndex].downloadURL;
-  var clipName = urls[currentIndex].date;
-  console.log("Next audio ["+currentIndex+"]", clipName, audioURL);
-  audio.src = audioURL;
-  audio.nextSibling.textContent = clipName;  // next sibling is p
-
-  audio.play();
-}, false);
 
 
 var databaseRef = firebase.database().ref("tmp");
 
-// saves audio metadata objects in chronological order as they are added to firebase
-var urls = [];
-var currentIndex;  // index of audio currently playing, is set to 0 when more audio recieved and we need to start at the top
-
-
-// reads database once and initialize things
-// using ref.on is asynchronous and I'm not ready to commit to a fuzzy start up
-databaseRef.orderByKey().once("value", function(snapshot) {
-  console.log("value once!")
-  // ugly but correct way to clear array
-  urls.splice(0,urls.length);
-  // forEach is necessary to ensure ordering
-  snapshot.forEach(function(childSnapshot) {
-    // adds next audio to urls array
-    urls.push(childSnapshot.val());
-  });
-  //console.log("Number of db entries:", snapshot.numChildren());
-  //console.log("Size of urls array:", urls.length);
-
-  currentIndex = urls.length-1;
-  var audioURL = urls[currentIndex].downloadURL;
-  var clipName = urls[currentIndex].date;
-  console.log("First audio ["+currentIndex+"]", clipName, audioURL);
-  audio.src = audioURL;
-  audio.nextSibling.textContent = clipName;  // next sibling is p
-
-  audio.play();
-});
-
 databaseRef.orderByKey().on("value", function(snapshot) {
   console.log("value on!");
-  // ugly but right way to clear array
-  urls.splice(0,urls.length);
   snapshot.forEach(function(childSnapshot) {
-    urls.push(childSnapshot.val());
+    childData = childSnapshot.val();
+    createClip(childData.date, childData.downloadURL);
   });
-  console.log("Number of db entries:", snapshot.numChildren());
-  console.log("Size of urls array:", urls.length);
-
-  // reset current index to 0 so we restart at last index (most recent) next 
-  resetIndex();
 });
-
-function resetIndex() {
-   currentIndex = 0;
-}
 
 console.log("End of JS");
