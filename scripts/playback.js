@@ -104,6 +104,19 @@ audio.addEventListener('ended', function (e) {
   audio.play();
 }, false);
 
+audio.addEventListener('play', function (e) {
+  evtTgt = e.target;
+  
+  console.log('currentSrc:', evtTgt.currentSrc);
+  console.log('readyState:', evtTgt.readyState);
+  console.log('duration:', evtTgt.duration);
+
+  var bufferedTimeRanges = evtTgt.buffered;
+  console.log('buffered:', bufferedTimeRanges, bufferedTimeRanges.start(0), bufferedTimeRanges.end(bufferedTimeRanges.length-1));
+  var seekableTimeRanges = evtTgt.seekable;
+  console.log('seekable:', seekableTimeRanges, seekableTimeRanges.start(0), seekableTimeRanges.end(bufferedTimeRanges.length-1));
+}, false);
+
 
 var databaseRef = firebase.database().ref(firebaseRoot);
 
