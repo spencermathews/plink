@@ -110,12 +110,13 @@ if (navigator.getUserMedia) {
       var hour = d.getHours();
       var min = d.getMinutes();
       var sec = d.getSeconds();
-      let time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
+      var time = `${year}-${month}-${day}-${hour}-${min}-${sec}`;
 
+      var name = time + ".webm";
       // for whatever reason blob, which is local to parent function onSuccess, is
       console.log("Uploading blob of size", blob.size, "and type", blob.type);
-      let storageRef = firebase.storage().ref("tmp").child(time + ".webm")
-      let uploadTask = storageRef.put(blob);
+      let storageRef = firebase.storage().ref("tmp");
+      let uploadTask = storageRef.child(name).put(blob);
 
       deleteLastClip();
 
@@ -150,7 +151,8 @@ if (navigator.getUserMedia) {
         let data = {
           time: time,
           downloadURL: downloadURL,
-          date: d.toISOString()        
+          date: d.toISOString(),
+          name: name
         }
 
         let databaseRef = firebase.database().ref("tmp").push(data);
