@@ -34,6 +34,15 @@ function createClip(clipName, audioURL) {
 
   deleteButton.onclick = function(e) {
     evtTgt = e.target;
+    
+    var audioElement = evtTgt.parentNode.firstElementChild;
+    if (audioElement.src.includes("blob")) {
+      window.URL.revokeObjectURL(audioElement.src);
+    } else if (audioElement.src.includes("firebasestorage")){
+      databaseDeleteRef = databaseRef.child(audioElement.src)
+
+      storageDeleteRef = storageRef.child(audioElement.src);
+    }
     evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
   }
 
@@ -84,5 +93,7 @@ databaseRef.orderByKey().on("value", function(snapshot) {
     createClip(childData.date, childData.downloadURL);
   });
 });
+
+var storageRef = firebase.storage().ref("tmp");
 
 console.log("End of JS");
