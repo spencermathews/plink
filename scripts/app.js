@@ -107,8 +107,8 @@ if (navigator.getUserMedia) {
       console.log("Saving to Firebase");
       var d = new Date();
       var year = d.getFullYear();
-      var month = d.getMonth();
-      var day = d.getDate();
+      var month = ('0' + (d.getMonth() + 1)).slice(-2);
+      var day = ('0' + d.getDate()).slice(-2);
       var hour = d.getHours();
       var min = d.getMinutes();
       var sec = d.getSeconds();
