@@ -1,3 +1,5 @@
+var firebaseRoot = 'test';
+
 // fork getUserMedia for multiple browser versions, for the future
 // when more browsers support MediaRecorder
 
@@ -115,7 +117,7 @@ if (navigator.getUserMedia) {
       var name = time + ".webm";
       // for whatever reason blob, which is local to parent function onSuccess, is
       console.log("Uploading blob of size", blob.size, "and type", blob.type);
-      let storageRef = firebase.storage().ref("tmp");
+      let storageRef = firebase.storage().ref(firebaseRoot);
       let uploadTask = storageRef.child(name).put(blob);
 
       deleteLastClip();
@@ -155,7 +157,7 @@ if (navigator.getUserMedia) {
           name: name
         }
 
-        let databaseRef = firebase.database().ref("tmp").push(data);
+        let databaseRef = firebase.database().ref(firebaseRoot).push(data);
 
         // create new clip element referencing the data on firebase
         clipName = d.toISOString();
