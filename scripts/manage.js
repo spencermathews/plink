@@ -93,9 +93,11 @@ function createClip(clipName, audioURL) {
   }, false);
 
   audio.addEventListener('play', function (e) {
+    console.log('Audio play');
     evtTgt = e.target;
 
     console.log('currentSrc:', evtTgt.currentSrc);
+    console.log('networkState:', evtTgt.networkState);
     console.log('readyState:', evtTgt.readyState);
     console.log('duration:', evtTgt.duration);
     
