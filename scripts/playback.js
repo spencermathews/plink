@@ -1,3 +1,5 @@
+var firebaseRoot = 'test';
+
 // set up basic variables for app
 
 var record = document.querySelector('.record');
@@ -103,7 +105,7 @@ audio.addEventListener('ended', function (e) {
 }, false);
 
 
-var databaseRef = firebase.database().ref("tmp");
+var databaseRef = firebase.database().ref(firebaseRoot);
 
 // saves audio metadata objects in chronological order as they are added to firebase
 var urls = [];
