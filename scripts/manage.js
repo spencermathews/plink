@@ -34,6 +34,27 @@ function createClip(clipName, audioURL) {
 
   deleteButton.onclick = function(e) {
     evtTgt = e.target;
+    
+    var audioElement = evtTgt.parentNode.firstElementChild;
+    if (audioElement.src.includes("blob")) {
+      window.URL.revokeObjectURL(audioElement.src);
+    } else if (audioElement.src.includes("firebasestorage")){
+      databaseDeleteRef = databaseRef.child(audioElement.dataset.firebaseKey);  // data-firebase-key custom data attribute
+      // Delete reference from database
+      databaseRef.remove().then(function() {
+        console.log("Remove succeeded.");
+        // trust that the audio element attributes were properly written so that database key and storage name correspond
+        storageDeleteRef = storageRef.child(audioElement.dataset.firebaseName);
+        // Delete the file
+        storageDeleteRef.delete().then(function() {
+          console.log("Delete succeeded.");
+        }).catch(function(error) {
+          console.log("Delete failed: " + error.message);
+        });
+      }).catch(function(error) {
+        console.log("Remove failed: " + error.message);
+      });
+    }
     evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
   }
 
@@ -72,6 +93,8 @@ function createClip(clipName, audioURL) {
   // TODO add listener that stops other audio when play another
   // TODO change color to highlight currently playing
   // TODO print out length of clip in player
+
+  return audio;
 }
 
 
@@ -80,9 +103,14 @@ var databaseRef = firebase.database().ref("tmp");
 databaseRef.orderByKey().on("value", function(snapshot) {
   console.log("value on!");
   snapshot.forEach(function(childSnapshot) {
-    childData = childSnapshot.val();
-    createClip(childData.date, childData.downloadURL);
+    var childData = childSnapshot.val();
+    var childKey = childSnapshot.key;
+    var audio = createClip(childData.date, childData.downloadURL);
+    audio.setAttribute('data-firebase-key', childKey);
+    audio.setAttribute('data-firebase-name', childData.name);
   });
 });
+
+var storageRef = firebase.storage().ref("tmp");
 
 console.log("End of JS");
