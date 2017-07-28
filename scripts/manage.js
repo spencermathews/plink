@@ -4,6 +4,9 @@ var firebaseRoot = 'test';
 
 var soundClips = document.querySelector('.sound-clips');
 
+var databaseRef = firebase.database().ref(firebaseRoot);
+var storageRef = firebase.storage().ref(firebaseRoot);
+
 
 function createClip(clipName, audioURL) {
   // clipName was here
@@ -37,17 +40,21 @@ function createClip(clipName, audioURL) {
   deleteButton.onclick = function(e) {
     evtTgt = e.target;
     
+    // Get audio element attached to this delete button
     var audioElement = evtTgt.parentNode.firstElementChild;
+    // Delete src file from database and storage
     if (audioElement.src.includes("blob")) {
       window.URL.revokeObjectURL(audioElement.src);
     } else if (audioElement.src.includes("firebasestorage")){
-      databaseDeleteRef = databaseRef.child(audioElement.dataset.firebaseKey);  // data-firebase-key custom data attribute
+      var databaseDeleteRef = databaseRef.child(audioElement.dataset.firebaseKey);  // data-firebase-key custom data attribute
       // Delete reference from database
-      databaseRef.remove().then(function() {
+      console.log('Removing', databaseDeleteRef.key);
+      databaseDeleteRef.remove().then(function() {
         console.log("Remove succeeded.");
         // trust that the audio element attributes were properly written so that database key and storage name correspond
-        storageDeleteRef = storageRef.child(audioElement.dataset.firebaseName);
-        // Delete the file
+        var storageDeleteRef = storageRef.child(audioElement.dataset.firebaseName);
+        // Delete the file from storage
+        console.log('Deleting', storageDeleteRef.name);
         storageDeleteRef.delete().then(function() {
           console.log("Delete succeeded.");
         }).catch(function(error) {
@@ -57,7 +64,8 @@ function createClip(clipName, audioURL) {
         console.log("Remove failed: " + error.message);
       });
     }
-    evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+    // Don't remove node here since we clear all clip nodes on every firebase refresh
+    //evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
   }
 
   clipLabel.onclick = function() {
@@ -100,10 +108,17 @@ function createClip(clipName, audioURL) {
 }
 
 
-var databaseRef = firebase.database().ref(firebaseRoot);
-
 databaseRef.orderByKey().on("value", function(snapshot) {
   console.log("value on!");
+
+  // Clear all audio clips before rebuilding with current snapshot
+  var clips = soundClips.children;
+  console.log("Clearing", clips.length, 'clips for refresh');
+  while(soundClips.firstElementChild) {
+    soundClips.removeChild(soundClips.firstElementChild);
+  }
+
+  // Create audio elements for each item in the database
   snapshot.forEach(function(childSnapshot) {
     var childData = childSnapshot.val();
     var childKey = childSnapshot.key;
@@ -111,8 +126,8 @@ databaseRef.orderByKey().on("value", function(snapshot) {
     audio.setAttribute('data-firebase-key', childKey);
     audio.setAttribute('data-firebase-name', childData.name);
   });
+  console.log("Number of db entries:", snapshot.numChildren());
 });
 
-var storageRef = firebase.storage().ref(firebaseRoot);
 
 console.log("End of JS");
