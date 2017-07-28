@@ -1,4 +1,4 @@
-var firebaseRoot = 'test';
+var firebaseRoot = 'tmp';
 
 // set up basic variables for app
 
