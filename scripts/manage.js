@@ -94,7 +94,11 @@ function createClip(clipName, audioURL) {
 
   audio.addEventListener('play', function (e) {
     evtTgt = e.target;
+
+    console.log('currentSrc:', evtTgt.currentSrc);
     console.log('readyState:', evtTgt.readyState);
+    console.log('duration:', evtTgt.duration);
+    
     var bufferedTimeRanges = evtTgt.buffered;
     console.log('buffered:', bufferedTimeRanges, bufferedTimeRanges.start(0), bufferedTimeRanges.end(bufferedTimeRanges.length-1));
     var seekableTimeRanges = evtTgt.seekable;
@@ -114,6 +118,7 @@ databaseRef.orderByKey().on("value", function(snapshot) {
   // Clear all audio clips before rebuilding with current snapshot
   var clips = soundClips.children;
   console.log("Clearing", clips.length, 'clips for refresh');
+  // This is the right way to clear all children (may want to use firstChild)
   while(soundClips.firstElementChild) {
     soundClips.removeChild(soundClips.firstElementChild);
   }
