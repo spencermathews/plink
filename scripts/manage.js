@@ -1,3 +1,5 @@
+var firebaseRoot = 'test';
+
 // set up basic variables for app
 
 var soundClips = document.querySelector('.sound-clips');
@@ -98,7 +100,7 @@ function createClip(clipName, audioURL) {
 }
 
 
-var databaseRef = firebase.database().ref("tmp");
+var databaseRef = firebase.database().ref(firebaseRoot);
 
 databaseRef.orderByKey().on("value", function(snapshot) {
   console.log("value on!");
@@ -111,6 +113,6 @@ databaseRef.orderByKey().on("value", function(snapshot) {
   });
 });
 
-var storageRef = firebase.storage().ref("tmp");
+var storageRef = firebase.storage().ref(firebaseRoot);
 
 console.log("End of JS");
