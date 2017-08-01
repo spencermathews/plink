@@ -44,7 +44,7 @@ function createClip(clipName, audioURL) {
   //audio.setAttribute('autoplay', '');
 
   if(clipName === null) {
-    clipLabel.textContent = 'My unnamed clip';
+    clipLabel.textContent = '';
   } else {
     clipLabel.textContent = clipName;
   }
@@ -71,7 +71,7 @@ function createClip(clipName, audioURL) {
 
 // creates and initializes audio element
 var audioURL = '';  // if null will try to fetch and give 404, even if not playing
-var clipName = 'Nothing here yet';
+var clipName = '';
 createClip(clipName, audioURL);
 
 var audio = document.querySelector('audio');
