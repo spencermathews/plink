@@ -204,17 +204,15 @@ if (navigator.getUserMedia) {
     }
   }
 
+  // modified to remove delete button
   function createClip(clipName, audioURL) {
     // clipName was here
     var clipContainer = document.createElement('article');
     var clipLabel = document.createElement('p');
     var audio = document.createElement('audio');
-    var deleteButton = document.createElement('button');
-   
+    
     clipContainer.classList.add('clip');
     audio.setAttribute('controls', '');
-    deleteButton.textContent = 'Delete';
-    deleteButton.className = 'delete';
 
     if(clipName === null) {
       clipLabel.textContent = 'My unnamed clip';
@@ -224,7 +222,6 @@ if (navigator.getUserMedia) {
 
     clipContainer.appendChild(audio);
     clipContainer.appendChild(clipLabel);
-    clipContainer.appendChild(deleteButton);
     soundClips.appendChild(clipContainer);
 
     audio.controls = true;
@@ -232,28 +229,6 @@ if (navigator.getUserMedia) {
     // audioURL was here
     audio.src = audioURL;
     console.log("recorder stopped");
-
-    deleteButton.onclick = function(e) {
-      evtTgt = e.target;
-      evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-
-      // added to allow garbage collection of blobs
-      // variable binding seems to occur and persist, so we can reference audioURL and deleteButton
-      // and they will refer to the values current on binding!?
-      // we'd also want to null blob if there were more references to it around
-      // all three ways of obtaining src are equivalent and equal to originally audioURL
-      // note must get src before removing elements but not if using audioURL 
-      //let src = evtTgt.parentNode.querySelector("audio").src;
-      //let src = this.parentNode.querySelector("audio").src;
-      //let src = deleteButton.parentNode.querySelector("audio").src;
-      // console.log(src, audioURL);
-      // if (src.includes("blob")) {
-      //   window.URL.revokeObjectURL(src);
-      // }
-      if (audioURL.includes("blob")) {
-        window.URL.revokeObjectURL(audioURL);
-      }
-    }
 
     clipLabel.onclick = function() {
       var existingName = clipLabel.textContent;

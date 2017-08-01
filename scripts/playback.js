@@ -32,18 +32,16 @@ stop.onclick = function() {
 }
 
 
+// modified to remove delete button
 function createClip(clipName, audioURL) {
   // clipName was here
   var clipContainer = document.createElement('article');
   var clipLabel = document.createElement('p');
   var audio = document.createElement('audio');
-  var deleteButton = document.createElement('button');
  
   clipContainer.classList.add('clip');
   audio.setAttribute('controls', '');
   //audio.setAttribute('autoplay', '');
-  deleteButton.textContent = 'Delete';
-  deleteButton.className = 'delete';
 
   if(clipName === null) {
     clipLabel.textContent = 'My unnamed clip';
@@ -53,18 +51,12 @@ function createClip(clipName, audioURL) {
 
   clipContainer.appendChild(audio);
   clipContainer.appendChild(clipLabel);
-  clipContainer.appendChild(deleteButton);
   soundClips.appendChild(clipContainer);
 
   audio.controls = true;
   // blob was here
   // audioURL was here
   audio.src = audioURL;
-
-  deleteButton.onclick = function(e) {
-    evtTgt = e.target;
-    evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-  }
 
   clipLabel.onclick = function() {
     var existingName = clipLabel.textContent;
