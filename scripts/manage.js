@@ -96,15 +96,20 @@ function createClip(clipName, audioURL) {
     console.log('Audio play');
     evtTgt = e.target;
 
+    console.log('src:', evtTgt.src);
     console.log('currentSrc:', evtTgt.currentSrc);
     console.log('networkState:', evtTgt.networkState);
     console.log('readyState:', evtTgt.readyState);
     console.log('duration:', evtTgt.duration);
     
     var bufferedTimeRanges = evtTgt.buffered;
-    console.log('buffered:', bufferedTimeRanges, bufferedTimeRanges.start(0), bufferedTimeRanges.end(bufferedTimeRanges.length-1));
+    if(bufferedTimeRanges.length > 0) {
+      console.log('buffered:', bufferedTimeRanges.start(0)+'-'+bufferedTimeRanges.end(bufferedTimeRanges.length-1));
+    }
     var seekableTimeRanges = evtTgt.seekable;
-    console.log('seekable:', seekableTimeRanges, seekableTimeRanges.start(0), seekableTimeRanges.end(bufferedTimeRanges.length-1));
+    if(seekableTimeRanges.length > 0) {
+      console.log('seekable:', seekableTimeRanges.start(0)+'-'+seekableTimeRanges.end(bufferedTimeRanges.length-1));
+    }
   }, false);
   // TODO add listener that stops other audio when play another
   // TODO change color to highlight currently playing

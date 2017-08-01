@@ -113,15 +113,21 @@ audio.addEventListener('play', function (e) {
   console.log('Audio play');
   evtTgt = e.target;
   
+  console.log('src:', evtTgt.src);
+  // observed networkState/readyState of 1/4 normally, and 3/0 mid switch, before currentSrc is updated to the new src
   console.log('currentSrc:', evtTgt.currentSrc);
   console.log('networkState:', evtTgt.networkState);
   console.log('readyState:', evtTgt.readyState);
   console.log('duration:', evtTgt.duration);
 
   var bufferedTimeRanges = evtTgt.buffered;
-  console.log('buffered:', bufferedTimeRanges, bufferedTimeRanges.start(0), bufferedTimeRanges.end(bufferedTimeRanges.length-1));
+  if(bufferedTimeRanges.length > 0) {
+    console.log('buffered:', bufferedTimeRanges.start(0)+'-'+bufferedTimeRanges.end(bufferedTimeRanges.length-1));
+  }
   var seekableTimeRanges = evtTgt.seekable;
-  console.log('seekable:', seekableTimeRanges, seekableTimeRanges.start(0), seekableTimeRanges.end(bufferedTimeRanges.length-1));
+  if(seekableTimeRanges.length > 0) {
+    console.log('seekable:', seekableTimeRanges.start(0)+'-'+seekableTimeRanges.end(bufferedTimeRanges.length-1));
+  }
 }, false);
 
 
