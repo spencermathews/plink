@@ -167,15 +167,15 @@ if (navigator.getUserMedia) {
         }
 
         var databaseRef = firebase.database().ref(firebaseRoot);
-        databaseRef.push(data);
+        databaseRef.push(data, function() {
+          // When write to server is complete
+          console.log('Database updated');
 
-        // create new clip element referencing the data on firebase
-        clipName = d.toISOString();
-        //console.log(clipName);
-        //var blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
-        //chunks = [];
-        audioURL = downloadURL;
-        createClip(clipName, audioURL);
+          // create new clip element referencing the data on firebase
+          var clipName = d.toISOString();
+          var audioURL = downloadURL;
+          createClip(clipName, audioURL);
+        });
       });
     }
 
