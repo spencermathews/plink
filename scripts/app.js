@@ -35,15 +35,12 @@ var canvasCtx = canvas.getContext("2d");
 if (navigator.getUserMedia) {
   console.log('getUserMedia supported.');
 
-  var types = ["video/webm", 
-             "audio/webm", 
-             "video/webm\;codecs=vp8", 
-             "video/webm\;codecs=daala", 
-             "video/webm\;codecs=h264", 
-             "video/mpeg",
-             "audio/ogg",
-             "audio/webm\;codecs=opus",
-             "audio/ogg\;codecs=opus"];
+  var types = ['audio/webm',
+             'audio/webm; codecs="opus"',
+             'audio/webm; codecs="vorbis"',
+             'audio/ogg',
+             'audio/ogg; codecs="opus"',
+             'audio/ogg; codecs="vorbis"'];
 
   for (var i in types) { 
     console.log( "Is " + types[i] + " supported? " + (MediaRecorder.isTypeSupported(types[i]) ? "Maybe!" : "Nope :(")); 
