@@ -88,7 +88,7 @@ var audio = document.querySelector('audio');
 audio.addEventListener('ended', function (e) {
   //audio.currentTime = 0;  // may be necessary or else callback might only be called once, and may be necessary to pause before
   console.log('Audio ended: duration', audio.duration);
-  audio.pause();  // may not be necessary
+  audio.pause();
 
   if (currentIndex > 0) {
     currentIndex--;
@@ -100,8 +100,13 @@ audio.addEventListener('ended', function (e) {
   console.log("Next audio ["+currentIndex+"]", clipName, audioURL);
   audio.src = audioURL;
   audio.nextSibling.textContent = clipName;  // next sibling is p
+  audio.load();
 
-  audio.play();
+  
+  // Begin the "next" clip as long as people are around, otherwise wait until motion triggers play
+  if(isTargetInSight) {
+    audio.play();
+  }
 }, false);
 
 audio.addEventListener('play', function (e) {
@@ -203,7 +208,7 @@ function declareLost() {
   console.log('Motion lost');
   isTargetInSight = false;
   document.body.style.backgroundColor = null;
-  audio.pause();
+  //audio.pause();
 }
 
 DiffCamEngine.init({
