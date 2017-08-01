@@ -141,8 +141,8 @@ databaseRef.orderByKey().once("value", function(snapshot) {
     // adds next audio to urls array
     urls.push(childSnapshot.val());
   });
-  //console.log("Number of db entries:", snapshot.numChildren());
-  //console.log("Size of urls array:", urls.length);
+  console.log("Number of db entries:", snapshot.numChildren());
+  console.log("Size of urls array:", urls.length);
 
   currentIndex = urls.length-1;
   var audioURL = urls[currentIndex].downloadURL;
