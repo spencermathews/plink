@@ -59,6 +59,9 @@ if (navigator.getUserMedia) {
     var blob;
     var audioURL;
 
+    var recordTimeout;
+    var TimeOut = 180000;
+
     visualize(stream);
 
     record.onclick = function() {
@@ -75,6 +78,9 @@ if (navigator.getUserMedia) {
       record.disabled = true;
 
       deleteLastClip();
+
+      // Set timeout to enforce recording time limit by simulating click on stop button
+      recordTimeout = setTimeout(function() {stop.click()}, TimeOut);
     }
 
     stop.onclick = function() {
@@ -90,6 +96,9 @@ if (navigator.getUserMedia) {
       save.disabled = false;
       stop.disabled = true;
       record.disabled = false;
+
+      // Clear the timelimit timeout
+      clearTimeout(recordTimeout);
     }
 
     save.onclick = function() {
