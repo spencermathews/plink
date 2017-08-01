@@ -2,36 +2,13 @@ var firebaseRoot = 'tmp';
 
 // set up basic variables for app
 
-var record = document.querySelector('.record');
-var stop = document.querySelector('.stop');
 var soundClips = document.querySelector('.sound-clips');
 var canvas = document.querySelector('.visualizer');
 
 // hide elements we don't need
-record.style.display = 'none';
-stop.style.display = 'none';
 canvas.style.display = 'none';
 
-// disable stop button while not recording
-
-stop.disabled = true;
-
-record.onclick = function() {
-  record.style.background = "red";
-
-  stop.disabled = false;
-  record.disabled = true;
-}
-
-stop.onclick = function() {
-  record.style.background = "";
-  record.style.color = "";
-
-  stop.disabled = true;
-  record.disabled = false;
-}
-
-
+ 
 // modified to remove delete button
 function createClip(clipName, audioURL) {
   // clipName was here
