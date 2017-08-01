@@ -181,7 +181,7 @@ if (navigator.getUserMedia) {
     function deleteLastClip() {
       var clip = soundClips.lastElementChild;  // when used lastElement then got text node of comments, even though soundClips.children.length was 0! Looks like childElementCount would be better
       if(clip) {
-        window.URL.revokeObjectURL(clip.firstChild.src);  // this should be equal to audioURL at this point, not a problem if we end up calling on a URL that is not a blob
+        window.URL.revokeObjectURL(clip.firstElementChild.src);  // this should be equal to audioURL at this point, not a problem if we end up calling on a URL that is not a blob
         soundClips.removeChild(clip);  // should not throw error even if there is no last child
         // we might be tempted to null blob here, but not necessary since we're reusing the blob variable
       }
