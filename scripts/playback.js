@@ -99,7 +99,7 @@ audio.addEventListener('ended', function (e) {
   var clipName = urls[currentIndex].date;
   console.log("Next audio ["+currentIndex+"]", clipName, audioURL);
   audio.src = audioURL;
-  audio.nextSibling.textContent = clipName;  // next sibling is p
+  audio.nextElementSibling.textContent = clipName;  // next sibling is p
   audio.load();
 
   
@@ -157,7 +157,7 @@ databaseRef.orderByKey().once("value", function(snapshot) {
   var clipName = urls[currentIndex].date;
   console.log("First audio ["+currentIndex+"]", clipName, audioURL);
   audio.src = audioURL;
-  audio.nextSibling.textContent = clipName;  // next sibling is p
+  audio.nextElementSibling.textContent = clipName;  // next sibling is p
 
   audio.play();
 });
