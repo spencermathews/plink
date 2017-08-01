@@ -166,7 +166,8 @@ if (navigator.getUserMedia) {
           name: name
         }
 
-        var databaseRef = firebase.database().ref(firebaseRoot).push(data);
+        var databaseRef = firebase.database().ref(firebaseRoot);
+        databaseRef.push(data);
 
         // create new clip element referencing the data on firebase
         clipName = d.toISOString();
