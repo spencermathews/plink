@@ -7,6 +7,8 @@ var soundClips = document.querySelector('.sound-clips');
 var databaseRef = firebase.database().ref(firebaseRoot);
 var storageRef = firebase.storage().ref(firebaseRoot);
 
+var lastSelected, lastSelectedIndex;
+
 
 function createClip(clipName, audioURL) {
   // clipName was here
@@ -16,6 +18,7 @@ function createClip(clipName, audioURL) {
   var deleteButton = document.createElement('button');
  
   clipContainer.classList.add('clip');
+  clipLabel.style.userSelect = 'none';  // prevent text selection on shift+click
   audio.setAttribute('controls', '');
   audio.setAttribute('preload', 'metadata');  // prevent auto download
   deleteButton.textContent = 'Delete';
@@ -78,6 +81,83 @@ function createClip(clipName, audioURL) {
     }
   }
 
+  clipContainer.onclick = function(e) {
+    console.log("You clicked on", this.tagName);
+    
+    function select(element) {
+      element.setAttribute('data-state', 'selected');
+      element.style.backgroundColor = 'red';
+      element.style.border = '1px solid red';
+    }
+
+    function deselect(element) {
+      element.removeAttribute('data-state');
+      element.style.backgroundColor = '';
+      element.style.border = '';
+      lastSelect = null;
+      lastSelectedIndex = null;
+    }
+
+    if (this.dataset.state === 'selected') {
+      deselect(this);
+    } else {
+      select(this);
+
+      const clips = soundClips.children;
+
+      // gets the index of this element
+      for(let i = 0; i < clips.length; i++) {
+        if(clips[i] === this) {
+          var thisIndex = i;
+          console.log('thisIndex:', thisIndex);
+        }
+      }
+
+      // select elements between this and last selected if shift key was held
+      if (e.shiftKey) {
+        console.log(e.shiftKey, thisIndex, lastSelectedIndex);
+        if(thisIndex > lastSelectedIndex) {
+          console.log('Multiselect');
+          for(let i = thisIndex; i >= lastSelectedIndex; i--) {
+            console.log('Selecting index', i);
+            select(clips[i]);
+          }
+        } else {
+          console.log('Selected a higher index');
+        }
+        //TODO add ability to click a lower index
+        //TODO allow shift click on an already selected element, needs to rearrange shiftKey test
+        //TODO require contro+click to select multiple clips otherwise clear all
+      }
+
+      lastSelected = this;
+      lastSelectedIndex = thisIndex;
+    }
+
+    // Get audio element attached to this delete button
+    var audioElement = this.firstElementChild;
+    audioElement.style.backgroundColor = 'red';
+  }
+
+  document.addEventListener('keydown', (event) => {
+    const keyName = event.key;
+
+    if (keyName === 'd') {
+      console.log(`Pressed ${keyName}`);
+      //confirm('confirm');
+      const selectedElements = document.querySelectorAll(".sound-clips > article[data-state='selected']");
+
+      // gets the index of this element
+      for(let i = 0; i < selectedElements.length; i++) {
+        // hacky way to delete
+        // TODO move delete button code out to a named function and just call that
+        // but have to test for any scoping/closure bugs in delete callback
+        selectedElements[i].lastElementChild.click();
+      }
+    }
+  }, false);
+
+
   // sets callback for when audio completes
   audio.addEventListener('ended', function (e) {
     console.log('Audio ended: duration', audio.duration);
@@ -91,6 +171,7 @@ function createClip(clipName, audioURL) {
       console.log(e);
     }
   }, false);
+
 
   audio.addEventListener('play', function (e) {
     console.log('Audio play');
