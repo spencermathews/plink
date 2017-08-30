@@ -1,4 +1,4 @@
-var firebaseRoot = 'tmp';
+var firebaseRoot = 'test';
 
 // fork getUserMedia for multiple browser versions, for the future
 // when more browsers support MediaRecorder
